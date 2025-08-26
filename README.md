@@ -50,5 +50,3 @@ SkillSync uses the Google Generative AI model: **Gemini 1.5 Flash** for resume a
 - `requirements.txt` - Python dependencies
 - `.env` - Environment variables (not tracked in git)
 
-## License
-This project is for educational and demonstration purposes.
