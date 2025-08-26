@@ -3,10 +3,10 @@ from prompts import *
 from utils import ExtractPDF, SendRequest, CreatePDF
 
 # Streamlit App Layout Configuration
-st.set_page_config(page_title="ResumePerfector.ai", layout="wide")
+st.set_page_config(page_title="SkillSync", layout="wide")
 
 # App title and description
-st.title("ResumePerfector.ai")
+st.title("SkillSync")
 st.markdown("Optimize your resume for ATS with AI-driven insights and personalized feedback!")
 
 # Sidebar for navigation and options
