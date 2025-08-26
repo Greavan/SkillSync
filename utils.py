@@ -1,15 +1,24 @@
-import os 
-from fpdf import FPDF 
+import os
+from fpdf import FPDF
 from PyPDF2 import PdfReader
 from datetime import datetime
-from dotenv import load_dotenv 
 import google.generativeai as genai
 
-## load environment variables from .env file 
-load_dotenv()
+# For Streamlit secrets if deployed
+try:
+    import streamlit as st
+    API_KEY = st.secrets["general"]["GOOGLE_API_KEY"]
+except Exception:
+    # Fallback for local testing using .env
+    from dotenv import load_dotenv
+    load_dotenv()
+    API_KEY = os.getenv("GOOGLE_API_KEY")
 
-# Configure the generative AI model with API key
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+if not API_KEY:
+    raise ValueError("API key not found. Set it in .env or Streamlit secrets.")
+
+# Configure the generative AI model
+genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('models/gemini-1.5-flash-latest')
 
 # Function to get AI response based on input and prompt
@@ -17,7 +26,7 @@ def SendRequest(input_text, pdf_content, prompt):
     response = model.generate_content([input_text, pdf_content, prompt])
     return response.text
 
-## Function to extract text from PDF 
+# Function to extract text from PDF 
 def ExtractPDF(file):
     pdf = PdfReader(file)
     text = ""
@@ -25,17 +34,15 @@ def ExtractPDF(file):
         text += page.extract_text()
     return text 
 
-# Function to create a Optimized resume PDF
+# Function to create an optimized PDF
 def CreatePDF(text, input_filename):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=10)
-    pdf.set_margins(10, 10, 10)  # Set narrower margins to 10 mm
+    pdf.set_margins(10, 10, 10)
     pdf.set_font("Courier", size=10)
     for line in text.split("\n"):
-        # Ensure that the line is encoded in latin-1
         pdf.multi_cell(0, 10, line.encode('latin-1', 'replace').decode('latin-1'), align='L')
-    # Generate the timestamped filename with format ddmmyyyyhhmmss
     timestamp = datetime.now().strftime("%d%m%Y-%H%M%S")
     file_name = f"{input_filename}_Optimized_{timestamp}.pdf"
     pdf.output(file_name, 'F')
